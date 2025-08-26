@@ -1,0 +1,3 @@
+service: refinery-pipeline
+
+frameworkVersion: "4"
