@@ -1,3 +1,46 @@
 service: refinery-pipeline
 
 frameworkVersion: "4"
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  region: us-east-2
+  stage: ${opt:stage, 'dev'}
+  timeout: 30
+  memorySize: 512
+  environment:
+    STAGE: ${self:provider.stage}
+    OPENAI_API_KEY: ${env:OPENAI_API_KEY}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - logs:CreateLogGroup
+        - logs:CreateLogStream
+        - logs:PutLogEvents
+      Resource: "arn:aws:logs:*:*:*"
+
+plugins:
+  - serverless-esbuild
+
+custom:
+  esbuild:
+    bundle: true
+    minify: true
+    sourcemap: true
+    target: node20
+    mainFields: [main, module]
+    exclude:
+      - "@aws-sdk/client-s3"
+
+functions:
+  processor:
+    handler: index.handler
+    description: "Process scraped website content with AI enrichment"
+    events:
+      - httpApi:
+          path: /process
+          method: post
+      - httpApi:
+          path: /health
+          method: get
