@@ -44,5 +44,3 @@ coverage/
 *.swo
 *~
 
-# Mine
-setup.sh
