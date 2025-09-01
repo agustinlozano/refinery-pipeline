@@ -21,22 +21,9 @@ provider:
         - logs:PutLogEvents
       Resource: "arn:aws:logs:*:*:*"
 
-plugins:
-  - serverless-esbuild
-
-custom:
-  esbuild:
-    bundle: true
-    minify: true
-    sourcemap: true
-    target: node22
-    mainFields: [main, module]
-    exclude:
-      - "@aws-sdk/client-s3"
-
 functions:
   processor:
-    handler: index.handler
+    handler: dist/index.handler
     description: "Process scraped website content with AI enrichment"
     events:
       - httpApi:
@@ -45,3 +32,12 @@ functions:
       - httpApi:
           path: /health
           method: get
+
+package:
+  individually: true
+  patterns:
+    - dist/index.js
+    - "!node_modules/**"
+    - "!src/**"
+    - "!.git/**"
+    - "!*.md"
