@@ -9,7 +9,7 @@
     "test:local": "tsx src/test/local-test.ts",
     "test:token": "tsx src/test/token-test.ts",
     "test:configs": "tsx src/test/local-test.ts configs",
-    "deploy": "serverless deploy",
+    "deploy": "pnpm build && serverless deploy",
     "deploy:dev": "serverless deploy --stage dev",
     "deploy:prod": "serverless deploy --stage prod",
     "remove": "serverless remove",
@@ -39,7 +39,6 @@
     "@types/node": "^22.12.0",
     "esbuild": "^0.23.0",
     "serverless": "^4.2.4",
-    "serverless-esbuild": "^1.52.1",
     "tsx": "^4.17.0",
     "typescript": "^5.5.4"
   },
