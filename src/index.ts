@@ -48,6 +48,49 @@ const ProcessingRequestSchema = z.object({
 // Initialize Hono app
 const app = new Hono();
 
+// Token validation middleware
+app.use("/process", async (c, next) => {
+  const authHeader = c.req.header("Authorization");
+  const queryToken = c.req.query("token");
+
+  // Check for token in Authorization header (Bearer token) or query parameter
+  let providedToken: string | null = null;
+
+  if (authHeader?.startsWith("Bearer ")) {
+    providedToken = authHeader.substring(7);
+  } else if (queryToken) {
+    providedToken = queryToken;
+  }
+
+  const expectedToken = process.env.API_TOKEN;
+
+  if (!expectedToken) {
+    console.error("API_TOKEN environment variable not set");
+    return c.json(
+      {
+        success: false,
+        error: "Authentication not configured",
+      },
+      500
+    );
+  }
+
+  if (!providedToken || providedToken !== expectedToken) {
+    console.warn("Invalid or missing API token");
+    return c.json(
+      {
+        success: false,
+        error: "Invalid or missing API token",
+        message:
+          "Please provide a valid API token in Authorization header (Bearer token) or as 'token' query parameter",
+      },
+      401
+    );
+  }
+
+  await next();
+});
+
 // Health check endpoint
 app.get("/health", (c) => {
   return c.json({
