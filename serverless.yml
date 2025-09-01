@@ -12,6 +12,7 @@ provider:
   environment:
     STAGE: ${self:provider.stage}
     OPENAI_API_KEY: ${env:OPENAI_API_KEY}
+    API_TOKEN: ${env:API_TOKEN}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -28,7 +29,7 @@ custom:
     bundle: true
     minify: true
     sourcemap: true
-    target: node20
+    target: node22
     mainFields: [main, module]
     exclude:
       - "@aws-sdk/client-s3"
