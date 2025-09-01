@@ -7,7 +7,7 @@
     "build": "esbuild src/index.ts --bundle --platform=node --target=node22 --outfile=dist/index.js --sourcemap",
     "dev": "pnpm build && serverless invoke local -f processor",
     "test:local": "tsx src/test/local-test.ts",
-    "test:structure": "tsx src/test/structure-test.ts",
+    "test:token": "tsx src/test/token-test.ts",
     "test:configs": "tsx src/test/local-test.ts configs",
     "deploy": "serverless deploy",
     "deploy:dev": "serverless deploy --stage dev",
