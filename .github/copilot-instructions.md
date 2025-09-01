@@ -38,3 +38,4 @@ The idea is to build a foundation for a robust data enrichment service, starting
 - Avoid adding unnecessary abstractions or frameworks.
 - Do not assume synchronous/blocking logic – keep everything async.
 - Avoid suggesting database integrations for now (vector DB comes later).
+- Set up AWS credentials to serverless framework. The AWS CLI is already configured with the necessary permissions.
