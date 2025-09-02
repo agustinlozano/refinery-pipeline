@@ -2,6 +2,10 @@
 
 A serverless data pipeline processor running on AWS Lambda that enriches scraped website content using AI. Built with TypeScript, Hono, and the Vercel AI SDK.
 
+## Architecture Overview
+
+![alt text](refinery-schema.png)
+
 ## Features
 
 - **Content Structuring**: Organizes raw scraped content into structured data
