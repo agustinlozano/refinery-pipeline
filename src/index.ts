@@ -1,13 +1,8 @@
 import { Hono } from "hono";
 import { handle } from "hono/aws-lambda";
-import type {
-  APIGatewayProxyEvent,
-  APIGatewayProxyResult,
-  Context,
-} from "aws-lambda";
 import { z } from "zod";
 import { ContentProcessor } from "./processor";
-import type { ProcessingRequest, ScrapingResponse } from "./lib/types";
+import type { ProcessingRequest } from "./lib/types";
 
 // Validation schema for the incoming request
 const ProcessingRequestSchema = z.object({
