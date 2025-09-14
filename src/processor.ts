@@ -1,5 +1,5 @@
 import type {
-  ScrapingResponse,
+  ScrapingData,
   ProcessingRequest,
   ProcessingResponse,
   ProcessedResult,
@@ -18,7 +18,7 @@ export class ContentProcessor {
    * Process a single scraped result
    */
   async processSingleResult(
-    result: ScrapingResponse["results"][0],
+    result: ScrapingData["results"][0],
     options: ProcessingOptions = {}
   ): Promise<ProcessedResult> {
     const startTime = Date.now();
@@ -148,15 +148,16 @@ export class ContentProcessor {
     const startTime = Date.now();
     const { scrapingResponse, options = {} } = request;
 
-    console.log(
-      `Processing ${scrapingResponse.results.length} scraped results`
-    );
+    // Extract the actual scraping data from the HTTP response wrapper
+    const scrapingData = scrapingResponse.body;
+
+    console.log(`Processing ${scrapingData.results.length} scraped results`);
 
     const results: ProcessedResult[] = [];
     const errors: string[] = [];
 
     // Process results sequentially to avoid rate limits
-    for (const scrapedResult of scrapingResponse.results) {
+    for (const scrapedResult of scrapingData.results) {
       try {
         const processed = await this.processSingleResult(
           scrapedResult,
