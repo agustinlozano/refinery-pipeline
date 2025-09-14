@@ -4,30 +4,47 @@ import { z } from "zod";
 import { ContentProcessor } from "./processor";
 import type { ProcessingRequest } from "./lib/types";
 
+// Schema for the actual scraping data (inside the body)
+const ScrapingDataSchema = z.object({
+  success: z.boolean(),
+  timestamp: z.string(),
+  sitesProcessed: z.number(),
+  totalSitesConfigured: z.number(),
+  results: z.array(
+    z.object({
+      name: z.string(),
+      url: z.string(),
+      title: z.string(),
+      content: z.string(),
+      contentLength: z.number(),
+      scrapedAt: z.string(),
+      keywords: z.array(z.string()),
+      status: z.enum(["success", "failed"]),
+      error: z.string().optional(),
+      id: z.string().optional(),
+      domain: z.string().optional(),
+      wordCount: z.number().optional(),
+    })
+  ),
+  executionTime: z.number(),
+});
+
 // Validation schema for the incoming request
 const ProcessingRequestSchema = z.object({
   scrapingResponse: z.object({
-    success: z.boolean(),
-    timestamp: z.string(),
-    sitesProcessed: z.number(),
-    totalSitesConfigured: z.number(),
-    results: z.array(
-      z.object({
-        name: z.string(),
-        url: z.string(),
-        title: z.string(),
-        content: z.string(),
-        contentLength: z.number(),
-        scrapedAt: z.string(),
-        keywords: z.array(z.string()),
-        status: z.enum(["success", "failed"]),
-        error: z.string().optional(),
-        id: z.string().optional(),
-        domain: z.string().optional(),
-        wordCount: z.number().optional(),
-      })
-    ),
-    executionTime: z.number(),
+    statusCode: z.number(),
+    body: z.string().transform((str, ctx) => {
+      try {
+        const parsed = JSON.parse(str);
+        return ScrapingDataSchema.parse(parsed);
+      } catch (error) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Invalid JSON in body or body doesn't match expected schema",
+        });
+        return z.NEVER;
+      }
+    }),
   }),
   options: z
     .object({
@@ -103,7 +120,8 @@ app.post("/process", async (c) => {
 
     // Parse and validate request body
     const rawBody = await c.req.json();
-    console.log("Request body parsed, validating...");
+
+    console.log("Raw request body:", rawBody);
 
     const validationResult = ProcessingRequestSchema.safeParse(rawBody);
 
@@ -124,7 +142,7 @@ app.post("/process", async (c) => {
 
     const request: ProcessingRequest = validationResult.data;
     console.log(
-      `Processing ${request.scrapingResponse.results.length} scraped results`
+      `Processing ${request.scrapingResponse.body.results.length} scraped results`
     );
 
     // Check if OpenAI API key is configured
