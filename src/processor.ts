@@ -6,12 +6,15 @@ import type {
   ProcessingOptions,
 } from "./lib/types";
 import { AIService } from "./lib/ai-service";
+import { ContentRepository } from "./lib/content-repository";
 
 export class ContentProcessor {
   private aiService: AIService;
+  private repository: ContentRepository;
 
   constructor(model?: string) {
     this.aiService = new AIService(model);
+    this.repository = new ContentRepository();
   }
 
   /**
@@ -164,6 +167,25 @@ export class ContentProcessor {
           options
         );
         results.push(processed);
+
+        // Store processed result in DynamoDB (only store the required fields)
+        try {
+          await this.repository.store(processed);
+          console.log(
+            `Successfully stored processed result for ${processed.url}`
+          );
+        } catch (storeError) {
+          console.error(
+            `Failed to store result for ${processed.url}:`,
+            storeError
+          );
+          // Don't fail the entire operation if storage fails
+          errors.push(
+            `Storage failed for ${processed.url}: ${
+              storeError instanceof Error ? storeError.message : "Unknown error"
+            }`
+          );
+        }
 
         if (
           !processed.processingMetadata.success &&
