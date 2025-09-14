@@ -24,11 +24,12 @@ async function testProcessor() {
 
   try {
     console.log("📝 Testing with sample BCRA data...");
+
+    // The body is now already parsed as ScrapingData object
+    const scrapingData = sampleScrapingResponse.scrapingResponse.body;
+    console.log(`Processing URL: ${scrapingData.results[0].url}`);
     console.log(
-      `Processing URL: ${sampleScrapingResponse.scrapingResponse.results[0].url}`
-    );
-    console.log(
-      `Content length: ${sampleScrapingResponse.scrapingResponse.results[0].contentLength} chars\n`
+      `Content length: ${scrapingData.results[0].contentLength} chars\n`
     );
 
     const startTime = Date.now();
