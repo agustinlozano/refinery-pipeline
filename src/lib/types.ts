@@ -1,5 +1,5 @@
-// This interface is for the websites that have been scraped
-export interface ScrapingResponse {
+// This interface is for the actual scraped data (inside the HTTP response body)
+export interface ScrapingData {
   success: boolean;
   timestamp: string;
   sitesProcessed: number;
@@ -21,9 +21,21 @@ export interface ScrapingResponse {
   executionTime: number;
 }
 
+// This interface is for the HTTP response wrapper that contains the scraped data as a JSON string
+export interface ScrapingResponse {
+  statusCode: number;
+  body: string; // JSON string that contains ScrapingData
+}
+
+// After Zod validation and transformation, the body becomes the parsed ScrapingData object
+export interface ValidatedScrapingResponse {
+  statusCode: number;
+  body: ScrapingData; // Parsed ScrapingData object after Zod transform
+}
+
 // Processing pipeline types
 export interface ProcessingRequest {
-  scrapingResponse: ScrapingResponse;
+  scrapingResponse: ValidatedScrapingResponse; // Use the validated version
   options?: ProcessingOptions;
 }
 
